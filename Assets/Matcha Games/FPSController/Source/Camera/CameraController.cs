@@ -119,6 +119,7 @@ namespace URC.Camera
         /// </summary>
         private void UpdateRotation()
         {
+            if(ServiceHub.Instance.GameManager.GameState != GameState.Playing) return;
             // Get the input and clamp vertically
             m_rotation += GetRotation();
             m_rotation.y = Mathf.Clamp(m_rotation.y, -m_maxViewAngle, m_maxViewAngle);
