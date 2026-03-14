@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour
@@ -13,7 +14,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] bool _isFadingIn;
     [SerializeField] bool _isFadingOut;
 
+    [SerializeField] TMP_Text _interactionText;
+
     GameManager _gameManager;
+    PlayerInteractionController _playerInteractionController;
 
     public IEnumerator OnLevelLoad()
     {
@@ -31,16 +35,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         _gameManager = ServiceHub.Instance.GameManager;
-    }
-
-    public void ShowUI()
-    {
-        _isFadingIn = true;
-    }
-
-    public void HideUI()
-    {
-        _isFadingOut = true;
+        _playerInteractionController = ServiceHub.Instance.PlayerInteractionController;
     }
 
     private void Update()
@@ -57,6 +52,16 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void ShowUI()
+    {
+        _isFadingIn = true;
+    }
+
+    public void HideUI()
+    {
+        _isFadingOut = true;
+    }
+
     public void ShowGameplayUI()
     {
         _gameplayCanvas.SetActive(true);
@@ -71,6 +76,16 @@ public class UIManager : MonoBehaviour
     {
         _gameplayCanvas.SetActive(false);
         _pauseCanvas.SetActive(false);
+    }
+
+    public void EnableInteractionText(string message)
+    {
+        _interactionText.text = $"Press {_playerInteractionController._interactionKey} " + message;
+    }
+
+    public void DisableInteractionText()
+    {
+        _interactionText.text = "";
     }
 
     public void Continue()
