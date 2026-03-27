@@ -16,11 +16,18 @@ namespace Assets.Scripts
     public class Interactable : MonoBehaviour, IInteractable
     {
         [Header("Type of Interactable")]
-        [SerializeField] InteractableType _interactableType;
+        [SerializeField] public InteractableType _interactableType;
 
         [Header("Object to spawn")]
         [SerializeField] GameObject _objectToSpawn;
         [SerializeField] Transform _spawnPoint;
+
+        [Header("Movable Object")]
+        float _lerpSpeed = 20f;
+        float _throwForce = 20f;
+        public bool _isHolding;
+
+        PlayerInteractionController _playerInteraction;
 
         public string _message;
 
@@ -30,7 +37,7 @@ namespace Assets.Scripts
 
         Rigidbody _rigidbody;
 
-        private void Awake()
+        private void Start()
         {
             _outline = GetComponent<Outline>();
             if (_outline == null)
@@ -42,6 +49,27 @@ namespace Assets.Scripts
                 _rigidbody = GetComponent<Rigidbody>();
                 if (_rigidbody == null)
                     _rigidbody = gameObject.AddComponent<Rigidbody>();
+            }
+
+            _playerInteraction = ServiceHub.Instance.PlayerInteractionController;
+        }
+
+        private void Update()
+        {
+            if (_isHolding)
+            {
+                if (_playerInteraction._grabbedRb)
+                {
+                    _playerInteraction._grabbedRb.MovePosition(Vector3.Lerp(_playerInteraction._grabbedRb.position, _playerInteraction._objectHolder.transform.position, Time.deltaTime * _lerpSpeed));
+
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        _playerInteraction._grabbedRb.isKinematic = false;
+                        _playerInteraction._grabbedRb.AddForce(Camera.main.transform.forward * _throwForce, ForceMode.VelocityChange);
+                        _playerInteraction._grabbedRb = null;
+                        _isHolding = false;
+                    }
+                }
             }
         }
 
@@ -57,8 +85,7 @@ namespace Assets.Scripts
             }
             else if(_interactableType == InteractableType.MovableObject)
             {
-                //if(PlayerInteractionController.Instance._raycastPosition != null)
-                //    _rigidbody.AddForce(PlayerInteractionController.Instance._raycastPosition.forward * 5f, ForceMode.Impulse);
+                
             }
         }
 

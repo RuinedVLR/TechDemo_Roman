@@ -10,8 +10,11 @@ public class PlayerInteractionController : MonoBehaviour
     [Header("References")]
     [SerializeField] GameObject _camera;
     [SerializeField] float _playerReach;
+    [SerializeField] public Transform _objectHolder;
 
     Interactable _currentInteractable;
+
+    public Rigidbody _grabbedRb;
 
     //public Transform _raycastPosition;
 
@@ -36,7 +39,6 @@ public class PlayerInteractionController : MonoBehaviour
     {
         RaycastHit hit;
         Ray ray = new Ray(_camera.transform.position, _camera.transform.forward);
-        //_raycastPosition.position = ray.GetPoint(_playerReach);
         if (Physics.Raycast(ray, out hit, _playerReach))
         {
             if (hit.collider.TryGetComponent<Interactable>(out Interactable newInteractable))
@@ -63,6 +65,29 @@ public class PlayerInteractionController : MonoBehaviour
         {
             DisableCurrentInteractable();
         }
+
+        if (Input.GetKeyDown(_interactionKey) && hit.collider.gameObject.GetComponent<Interactable>()._interactableType == InteractableType.MovableObject)
+        {
+            if (_grabbedRb)
+            {
+                Debug.Log("Released");
+                _grabbedRb.GetComponent<Interactable>()._isHolding = false;
+                _grabbedRb.isKinematic = false;
+                _grabbedRb = null;
+            }
+            else
+            {
+                Debug.Log("Holding");
+                _grabbedRb = hit.collider.gameObject.GetComponent<Rigidbody>();
+                _grabbedRb.GetComponent<Interactable>()._isHolding = true;
+                if (_grabbedRb)
+                {
+                    _grabbedRb.isKinematic = true;
+                }
+            }
+        }
+
+        Debug.DrawRay(_camera.transform.position, _camera.transform.forward, Color.red);
     }
 
     void SetNewCurrentInteractable(Interactable newInteractable)
