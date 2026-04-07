@@ -23,6 +23,12 @@ namespace Assets.Scripts
         [SerializeField] Transform _spawnPoint;
 
         [Header("Movable Object")]
+        public bool _isRainbow;
+        [SerializeField] float _rainbowSpeed;
+        private float _hue;
+        private float _sat;
+        private float _bri;
+        private MeshRenderer _meshRenderer;
         float _lerpSpeed = 20f;
         float _throwForce = 20f;
         public bool _isHolding;
@@ -49,6 +55,7 @@ namespace Assets.Scripts
                 _rigidbody = GetComponent<Rigidbody>();
                 if (_rigidbody == null)
                     _rigidbody = gameObject.AddComponent<Rigidbody>();
+                _meshRenderer = GetComponent<MeshRenderer>();
             }
 
             _playerInteraction = ServiceHub.Instance.PlayerInteractionController;
@@ -70,6 +77,19 @@ namespace Assets.Scripts
                         _isHolding = false;
                     }
                 }
+            }
+
+            if (_isRainbow)
+            {
+                Color.RGBToHSV(_meshRenderer.material.color, out _hue, out _sat, out _bri);
+                _hue += _rainbowSpeed / 10000;
+                if (_hue >= 1)
+                {
+                    _hue = 0;
+                }
+                _sat = 1;
+                _bri = 1;
+                _meshRenderer.material.color = Color.HSVToRGB(_hue, _sat, _bri);
             }
         }
 
