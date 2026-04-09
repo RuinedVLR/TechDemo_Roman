@@ -11,6 +11,7 @@ public class PlayerInteractionController : MonoBehaviour
     [SerializeField] GameObject _camera;
     [SerializeField] float _playerReach;
     [SerializeField] public Transform _objectHolder;
+    [SerializeField] LayerMask _interactableLayer;
 
     Interactable _currentInteractable;
 
@@ -31,15 +32,33 @@ public class PlayerInteractionController : MonoBehaviour
     {
         if(_camera != null)
             CheckInteraction();
-        if (Input.GetKeyDown(_interactionKey) && _currentInteractable != null)
-            _currentInteractable.Interact();
+        
+        if (Input.GetKeyDown(_interactionKey))
+        {
+            if (_grabbedRb != null)
+            {
+                ReleaseObject();
+            }
+            else if (_currentInteractable != null && _currentInteractable._interactableType == InteractableType.MovableObject)
+            {
+                Rigidbody rb = _currentInteractable.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    GrabObject(rb);
+                }
+            }
+            else if (_currentInteractable != null)
+            {
+                _currentInteractable.Interact();
+            }
+        }
     }
 
     void CheckInteraction()
     {
         RaycastHit hit;
         Ray ray = new Ray(_camera.transform.position, _camera.transform.forward);
-        if (Physics.Raycast(ray, out hit, _playerReach))
+        if (Physics.Raycast(ray, out hit, _playerReach, _interactableLayer))
         {
             if (hit.collider.TryGetComponent<Interactable>(out Interactable newInteractable))
             {
@@ -66,28 +85,23 @@ public class PlayerInteractionController : MonoBehaviour
             DisableCurrentInteractable();
         }
 
-        if (Input.GetKeyDown(_interactionKey) && hit.collider.gameObject.GetComponent<Interactable>()._interactableType == InteractableType.MovableObject)
-        {
-            if (_grabbedRb)
-            {
-                Debug.Log("Released");
-                _grabbedRb.GetComponent<Interactable>()._isHolding = false;
-                _grabbedRb.isKinematic = false;
-                _grabbedRb = null;
-            }
-            else
-            {
-                Debug.Log("Holding");
-                _grabbedRb = hit.collider.gameObject.GetComponent<Rigidbody>();
-                _grabbedRb.GetComponent<Interactable>()._isHolding = true;
-                if (_grabbedRb)
-                {
-                    _grabbedRb.isKinematic = true;
-                }
-            }
-        }
-
         Debug.DrawRay(_camera.transform.position, _camera.transform.forward, Color.red);
+    }
+
+    void GrabObject(Rigidbody rb)
+    {
+        Debug.Log("Holding");
+        _grabbedRb = rb;
+        _grabbedRb.GetComponent<Interactable>()._isHolding = true;
+        _grabbedRb.useGravity = false;
+    }
+
+    void ReleaseObject()
+    {
+        Debug.Log("Released");
+        _grabbedRb.GetComponent<Interactable>()._isHolding = false;
+        _grabbedRb.useGravity = true;
+        _grabbedRb = null;
     }
 
     void SetNewCurrentInteractable(Interactable newInteractable)

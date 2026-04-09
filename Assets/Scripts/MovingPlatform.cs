@@ -7,33 +7,46 @@ public class MovingPlatform : MonoBehaviour
     [SerializeField] Transform _finishPosition;
     [SerializeField] float _cycleLength;
 
-    bool _isActivated;
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    Tween _currentTween;
+    Rigidbody _playerRb;
+    Vector3 _previousPosition;
+    bool _playerOnPlatform;
 
-    // Update is called once per frame
     void Update()
     {
+        if (_playerOnPlatform && _playerRb != null)
+        {
+            // calculate delta and move player by same amount as platform
+            Vector3 delta = transform.position - _previousPosition;
+            _playerRb.MovePosition(_playerRb.position + delta);
+        }
 
-
+        _previousPosition = transform.position;
     }
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            gameObject.transform.DOMove(_finishPosition.position, _cycleLength).SetEase(Ease.InOutSine);
-            _isActivated = true;
+            _playerRb = other.GetComponent<Rigidbody>() ?? other.GetComponentInParent<Rigidbody>();
+            _playerOnPlatform = true;
+
+            _currentTween?.Kill();
+            _currentTween = transform.DOMove(_finishPosition.position, _cycleLength)
+                .SetEase(Ease.InOutSine);
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    void OnTriggerExit(Collider other)
     {
-        DOTween.Clear();
-        gameObject.transform.DOMove(_startPosition.position, _cycleLength).SetEase(Ease.InOutSine);
+        if (other.CompareTag("Player"))
+        {
+            _playerOnPlatform = false;
+            _playerRb = null;
+
+            _currentTween?.Kill();
+            _currentTween = transform.DOMove(_startPosition.position, _cycleLength)
+                .SetEase(Ease.InOutSine);
+        }
     }
 }

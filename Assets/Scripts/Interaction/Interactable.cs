@@ -30,7 +30,6 @@ namespace Assets.Scripts
         private float _bri;
         private MeshRenderer _meshRenderer;
         float _lerpSpeed = 20f;
-        float _throwForce = 20f;
         public bool _isHolding;
 
         PlayerInteractionController _playerInteraction;
@@ -67,12 +66,20 @@ namespace Assets.Scripts
             {
                 if (_playerInteraction._grabbedRb)
                 {
-                    _playerInteraction._grabbedRb.MovePosition(Vector3.Lerp(_playerInteraction._grabbedRb.position, _playerInteraction._objectHolder.transform.position, Time.deltaTime * _lerpSpeed));
+                    Vector3 targetPosition = _playerInteraction._objectHolder.transform.position;
+                    Vector3 newPosition = Vector3.Lerp(_playerInteraction._grabbedRb.position, targetPosition, Time.deltaTime * _lerpSpeed);
+
+                    // calculate velocity as delta position over delta time
+                    _playerInteraction._grabbedRb.linearVelocity = (newPosition - _playerInteraction._grabbedRb.position) / Time.deltaTime;
+                    _playerInteraction._grabbedRb.MovePosition(newPosition);
 
                     if (Input.GetMouseButtonDown(0))
                     {
+                        // save the current velocity for throwing
+                        Vector3 throwVelocity = _playerInteraction._grabbedRb.linearVelocity;
+
                         _playerInteraction._grabbedRb.isKinematic = false;
-                        _playerInteraction._grabbedRb.AddForce(Camera.main.transform.forward * _throwForce, ForceMode.VelocityChange);
+                        _playerInteraction._grabbedRb.linearVelocity = throwVelocity;
                         _playerInteraction._grabbedRb = null;
                         _isHolding = false;
                     }
