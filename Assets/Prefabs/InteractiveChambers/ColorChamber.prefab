@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6494587860246417668}
   - component: {fileID: 8571688485600766039}
   - component: {fileID: 2032205661472341947}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 8952073430868051621}
   - component: {fileID: 5093579669329719293}
   - component: {fileID: 8401257717340576824}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9457,7 +9457,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1908375142704179757}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: ColorChamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}

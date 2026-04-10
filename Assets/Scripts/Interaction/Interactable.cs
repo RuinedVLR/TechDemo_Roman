@@ -78,7 +78,7 @@ namespace Assets.Scripts
                         // save the current velocity for throwing
                         Vector3 throwVelocity = _playerInteraction._grabbedRb.linearVelocity;
 
-                        _playerInteraction._grabbedRb.isKinematic = false;
+                        _playerInteraction._grabbedRb.useGravity = true;
                         _playerInteraction._grabbedRb.linearVelocity = throwVelocity;
                         _playerInteraction._grabbedRb = null;
                         _isHolding = false;

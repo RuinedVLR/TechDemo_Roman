@@ -17,20 +17,53 @@ public class GameManager : MonoBehaviour
     UIManager _uiManager;
 
     public GameObject _currentCheckpoint;
-
     public GameObject _lastCheckpoint;
+
+    [SerializeField] Transform _zone1Spawn;
+    [SerializeField] Transform _zone2Spawn;
 
     public GameObject _player;
     [SerializeField] CameraController _camera;
 
     public bool _isPaused;
 
+    private GameState _previousGameState;
+
+    bool _isWarping;
+    int _warpIndex = -1;
+
     public void Start()
     {
         _uiManager = ServiceHub.Instance.UIManager;
+        _previousGameState = GameState;
     }
 
     private void Update()
+    {
+        if (GameState != _previousGameState)
+        {
+            _previousGameState = GameState;
+            HandleStateChange();
+        }
+    }
+
+    public void Warp(int index)
+    {
+        Vector3 spawnPosition = index == 0 ? _zone1Spawn.position : _zone2Spawn.position;
+
+        _player.transform.position = spawnPosition;
+
+        Rigidbody rb = _player.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        _camera.transform.position = spawnPosition + new Vector3(0, 0, -10);
+    }
+
+    void HandleStateChange()
     {
         switch (GameState)
         {
@@ -54,7 +87,7 @@ public class GameManager : MonoBehaviour
         _uiManager.HideAllUI();
         _uiManager.ShowGameplayUI();
     }
-    
+
     void OnStatePause()
     {
         Cursor.lockState = CursorLockMode.None;
@@ -74,7 +107,6 @@ public class GameManager : MonoBehaviour
     {
         _isPaused = !_isPaused;
 
-        
         if (_isPaused)
         {
             GameState = GameState.Paused;

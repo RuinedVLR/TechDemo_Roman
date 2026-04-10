@@ -1,4 +1,5 @@
 using Assets.Scripts;
+using TMPro;
 using UnityEngine;
 
 public class PlayerInteractionController : MonoBehaviour
@@ -12,19 +13,27 @@ public class PlayerInteractionController : MonoBehaviour
     [SerializeField] float _playerReach;
     [SerializeField] public Transform _objectHolder;
     [SerializeField] LayerMask _interactableLayer;
+    [SerializeField] int _score;
+    [SerializeField] TMP_Text _scoreText;
+    [SerializeField] AudioClip _pickUpSound;
+    AudioSource _audioSource;
 
     Interactable _currentInteractable;
 
     public Rigidbody _grabbedRb;
 
-    //public Transform _raycastPosition;
+    int _zone1Index = 0;
+    int _zone2Index = 1;
 
     UIManager _uiManager;
+    GameManager _gameManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         _uiManager = ServiceHub.Instance.UIManager;
+        _gameManager = ServiceHub.Instance.GameManager;
+        _audioSource = GetComponentInParent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -51,6 +60,15 @@ public class PlayerInteractionController : MonoBehaviour
             {
                 _currentInteractable.Interact();
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            _gameManager.Warp(_zone1Index);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            _gameManager.Warp(_zone2Index);
         }
     }
 
@@ -119,5 +137,13 @@ public class PlayerInteractionController : MonoBehaviour
             _currentInteractable.DisableOutline();
             _currentInteractable = null;
         }
+    }
+
+    public void PickUp(GameObject pickUp)
+    {
+        _audioSource.PlayOneShot(_pickUpSound);
+        _score += 10;
+        _scoreText.text = $"Score: {_score}";
+        Destroy(pickUp);
     }
 }

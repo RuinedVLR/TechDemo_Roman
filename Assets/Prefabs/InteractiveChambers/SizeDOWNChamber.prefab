@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6139716715373052250}
   - component: {fileID: 7919236386431529624}
   - component: {fileID: 7593997298564602921}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9350,7 +9350,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2421948495640473400}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: SizeDOWNChamber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9386,7 +9386,7 @@ GameObject:
   - component: {fileID: 1126956387311878457}
   - component: {fileID: 2919253036282691904}
   - component: {fileID: 8982641760565664627}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
